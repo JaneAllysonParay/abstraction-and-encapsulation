@@ -7,27 +7,28 @@ This program is all about implentation of Abstraction and Encapsulation for C++ 
 #include <cctype>    // Header file for character manipulation
 #include <limits>    // Limits the number being accepted
 #include <iomanip>   // Header file for manipulating input and output
+#include <algorithm> // Header file for algorithm manipulation
 using namespace std; // For convenience and easy use of 'cin','cout', and other names
 
 // Employee class with pure virtual functions
 class Employee
 {
-// Private data members: name, ID, and salary
+    // Private data members: name, ID, and salary
 private:
     string name, id;
     double salary;
 
-// Public member functions
+    // Public member functions
 public:
     Employee(string name, string id, double salary) : name(name), id(id), salary(salary) {} // Constructor
-    virtual ~Employee() {}  // Virtual Destructor
-    
+    virtual ~Employee() {}                                                                  // Virtual Destructor
+
     // Pure virtual functions
     virtual void inputDetails(vector<Employee *> &employees) = 0;
     virtual void calculateSalary() = 0;
 
     // Getters for the private data members
-    string getName() 
+    string getName()
     {
         return name;
     }
@@ -67,12 +68,21 @@ bool isValidID(const string &id)
     return true;
 }
 
+// Function to convert a string to lowercase
+string toLowerCase(const string &str)
+{
+    string lowerStr = str;
+    transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
+}
+
 // A function for checking if ID is unique
 bool isIDUnique(const vector<Employee *> &employees, const string &id)
 {
     for (auto &employee : employees)
     {
-        if (employee->getID() == id) return false;
+        if (toLowerCase(employee->getID()) == id)
+            return false;
     }
     return true;
 }
@@ -81,7 +91,8 @@ bool isNameUnique(const vector<Employee *> &employees, const string &name)
 {
     for (auto &employee : employees)
     {
-        if (employee->getName() == name) return false;
+        if (toLowerCase(employee->getName()) == name)
+            return false;
     }
     return true;
 }
@@ -123,7 +134,7 @@ double getValidDouble(const string &prompt)
     {
         cout << prompt;
         cin >> input;
-        if (cin.fail() || cin.peek() != '\n' || input < 0)
+        if (cin.fail() || cin.peek() != '\n' || input <= 0)
         {
             cout << "Invalid input! Please enter a valid positive number." << endl;
             cin.clear();
@@ -147,7 +158,7 @@ int getValidInt(const string &prompt)
     {
         cout << prompt;
         cin >> input;
-        if (cin.fail() || cin.peek() != '\n' || input < 0)
+        if (cin.fail() || cin.peek() != '\n' || input <= 0)
         {
             cout << "Invalid input! Please enter a valid positive number." << endl;
             cin.clear();
@@ -190,7 +201,7 @@ int getValidMenu(const string &prompt, int minValue, int maxValue)
 class Full : public Employee
 {
 
-// Public member functions
+    // Public member functions
 public:
     // Constructor
     Full(string name, string id, double salary) : Employee(name, id, salary) {}
@@ -200,8 +211,8 @@ public:
     {
         cout << endl
              << "Employee Type: Full-Time Employee" << endl;
-        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         string id = getValidString("Enter Employee's ID: ", isValidID, employees, true);
+        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         double salary = getValidDouble("Enter Employee's Salary: ");
         employees.emplace_back(new Full(name, id, salary)); // Adding the employee to the vector
     }
@@ -210,7 +221,7 @@ public:
     void calculateSalary() override
     {
         cout << "Employee: " << getName() << " (ID: " << getID() << ")" << endl;
-        cout << "Fixed Monthly Salary: $" << fixed << setprecision(2) <<setw(10) << getSalary() << endl;
+        cout << "Fixed Monthly Salary: $" << fixed << setprecision(2) << setw(10) << getSalary() << endl;
     }
 };
 
@@ -218,11 +229,11 @@ public:
 class Part : public Employee
 {
 
-// Private data member: hours worked
+    // Private data member: hours worked
 private:
     double hrWork;
 
-// Public member functions
+    // Public member functions
 public:
     // Constructor
     Part(string name, string id, double salary, double hrWork) : Employee(name, id, salary), hrWork(hrWork) {}
@@ -232,8 +243,8 @@ public:
     {
         cout << endl
              << "Employee Type: Part-Time Employee" << endl;
-        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         string id = getValidString("Enter Employee's ID: ", isValidID, employees, true);
+        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         double salary = getValidDouble("Enter Hourly Wage: ");
         double hrWork = getValidInt("Enter Hours Worked: ");
         employees.emplace_back(new Part(name, id, salary, hrWork)); // Adding the employee to the vector
@@ -252,11 +263,11 @@ public:
 // Contract Class
 class Contract : public Employee
 {
-// Private data member: projects completed
+    // Private data member: projects completed
 private:
     int proj;
 
-// Public member functions
+    // Public member functions
 public:
     // Constructor
     Contract(string name, string id, double salary, int proj) : Employee(name, id, salary), proj(proj) {}
@@ -266,8 +277,8 @@ public:
     {
         cout << endl
              << "Employee Type: Contractual Employee" << endl;
-        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         string id = getValidString("Enter Employee's ID: ", isValidID, employees, true);
+        string name = getValidString("Enter Employee's Name: ", isValidName, employees, false);
         double salary = getValidDouble("Enter Payment Per Project: ");
         int proj = getValidInt("Enter Project/s Completed: ");
         employees.emplace_back(new Contract(name, id, salary, proj)); // Adding the employee to the vector
